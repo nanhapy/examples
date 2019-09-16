@@ -2,7 +2,6 @@
 authors = ["Dan Munckton <dangit@munckfish.net>"]
 name = "actix-todo"
 version = "0.1.0"
-workspace = ".."
 edition = "2018"
 
 [dependencies]
