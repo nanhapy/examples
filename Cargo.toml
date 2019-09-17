@@ -38,4 +38,5 @@ members = [
   "websocket-chat",
   "websocket-chat-broker",
   "websocket-tcp-chat",
+  "cc01"
 ]

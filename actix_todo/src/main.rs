@@ -62,6 +62,6 @@ fn main() -> io::Result<()> {
             .service(fs::Files::new("/static", "static/"))
     };
 
-    debug!("Starting server");
-    HttpServer::new(app).bind("localhost:8088")?.run()
+    debug!("Starting server2");
+    HttpServer::new(app).bind("0.0.0.0:8088")?.run()
 }

@@ -1,46 +1,50 @@
-# FROM rust:latest
-
-# WORKDIR /usr/src/myapp
-
-# COPY . .
-
-# RUN cargo build --release
-
-# RUN cargo install --path .
-
-# CMD ["/usr/local/cargo/bin/actix-todo"]
-
-
-# ------------------------------------------------------------------------------
-# Cargo Build Stage
-# ------------------------------------------------------------------------------
-
 FROM rust:latest as cargo-build
 
-WORKDIR /usr/src/myapp
+RUN apt-get update
 
-COPY Cargo.toml Cargo.toml
+RUN apt-get install musl-tools libpq-dev -y
 
-COPY Cargo.lock Cargo.lock
+RUN rustup target add x86_64-unknown-linux-musl
+
+WORKDIR /usr/src/cc01
+
+COPY ./Cargo.lock ./Cargo.lock
+COPY ./Cargo.toml ./Cargo.toml
+
+RUN mkdir src/
+
+RUN echo 'fn main() { println!("Dummy") }' > ./src/main.rs
+
+# RUN RUSTFLAGS=-Clinker=musl-gcc cargo build --release --target=x86_64-unknown-linux-musl
 
 RUN cargo build --release
 
-RUN rm -f target/release/deps/actix-todo*
+RUN rm -f target/release/deps/cc01*
 
-COPY . .
+COPY ./src ./src
+
+RUN cargo install diesel_cli --no-default-features --features postgres
 
 RUN cargo build --release
 
-RUN cargo install --path .
+COPY migrations /app/cc01/migrations
+COPY static /app/cc01/static
+COPY templates /app/cc01/templates
+RUN cp target/release/cc01 /app/cc01/cc01
+
+WORKDIR /app/cc01
+
+# CMD ["diesel database setup && ./cc01"]
+CMD ["sh","-c","diesel database setup && ./cc01"]
+
+# RUN RUSTFLAGS=-Clinker=musl-gcc cargo build --release --target=x86_64-unknown-linux-musl
 
 # ------------------------------------------------------------------------------
 # Final Stage
 # ------------------------------------------------------------------------------
 
-FROM alpine:latest
+# FROM alpine:latest
 
-COPY --from=cargo-build /usr/local/cargo/bin/actix-todo /usr/local/bin/actix-todo
+# COPY --from=cargo-build /usr/src/cc01/target/x86_64-unknown-linux-musl/release/cc01 /usr/local/bin/cc01
 
-RUN diesel database setup
-
-CMD ["actix-todo"]
+# CMD ["/app/cc01/cc01"]

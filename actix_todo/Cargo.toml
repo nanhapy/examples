@@ -1,6 +1,6 @@
 [package]
 authors = ["Dan Munckton <dangit@munckfish.net>"]
-name = "actix-todo"
+name = "cc01"
 version = "0.1.0"
 edition = "2018"
 

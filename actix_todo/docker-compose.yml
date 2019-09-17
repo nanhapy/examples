@@ -19,5 +19,21 @@ services:
       - db
     ports:
       - 9090:8080
-volumes: 
+  web:
+    container_name: cc01-local
+    environment:
+      - DATABASE_URL=postgres://admin:admin@pg-local/postgres
+      - RUST_BACKTRACE=1
+    image: cc01:stage
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - 8098:8088
+volumes:
   postgres_data:
+networks: 
+  cc01-nw:
